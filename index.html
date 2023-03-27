@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+</head>
+<body>
+<p>asdfasdf</p>
+</body>
+</html>
+<script type="text/javascript">
+	// 创建扫雷游戏类
+class MinesweeperGame {
+  constructor(width, height, minesCount) {
+    this.width = width;
+    this.height = height;
+    this.minesCount = minesCount;
+    this.grid = [];
+    this.isGameOver = false;
+
+    // 初始化游戏面板
+    for (let i = 0; i < height; i++) {
+      this.grid[i] = [];
+      for (let j = 0; j < width; j++) {
+        this.grid[i][j] = {
+          isMine: false,
+          isRevealed: false,
+          minesAround: 0
+        };
+      }
+    }
+
+    // 布置地雷
+    let minesPlaced = 0;
+    while (minesPlaced < minesCount) {
+      const row = Math.floor(Math.random() * height);
+      const col = Math.floor(Math.random() * width);
+      if (!this.grid[row][col].isMine) {
+        this.grid[row][col].isMine = true;
+        minesPlaced++;
+      }
+    }
+  }
+
+  // 点击格子
+  reveal(row, col) {
+    if (this.isGameOver || this.grid[row][col].isRevealed) {
+      return;
+    }
+
+    this.grid[row][col].isRevealed = true;
+
+    if (this.grid[row][col].isMine) {
+      this.isGameOver = true;
+      console.log('游戏结束！你踩雷了！');
+    } else {
+      const minesAround = this.countMinesAround(row, col);
+      this.grid[row][col].minesAround = minesAround;
+      console.log(`这个格子周围有 ${minesAround} 颗地雷。`);
+
+      if (minesAround === 0) {
+        // 如果周围没有地雷，就递归地揭示周围的格子
+        for (let i = row - 1; i <= row + 1; i++) {
+          for (let j = col - 1; j <= col + 1; j++) {
+            if (i >= 0 && i < this.height && j >= 0 && j < this.width) {
+              this.reveal(i, j);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 计算周围地雷数
+  countMinesAround(row, col) {
+    let count = 0;
+    for (let i = row - 1; i <= row + 1; i++) {
+      for (let j = col - 1; j <= col + 1; j++) {
+        if (i >= 0 && i < this.height && j >= 0 && j < this.width && this.grid[i][j].isMine) {
+          count++;
+        }
+      }
+    }
+    return count;
+  }
+}
+
+// 使用示例
+const game = new MinesweeperGame(10, 10, 10); // 创建一个 10 x 10 的游戏，有 10 颗地雷
+console.log(game)
+game.reveal(0, 0); // 点击 (0, 0) 格子
+
+</script>
